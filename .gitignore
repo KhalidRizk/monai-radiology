@@ -1,0 +1,14 @@
+images/
+radiology/model/**/
+radiology/__pycache__/
+radiology/lib/__pycache__/
+radiology/lib/activelearning/__pycache__/
+radiology/lib/trainers/__pycache__/
+radiology/lib/transforms/__pycache__/
+radiology/lib/configs/__pycache__/
+radiology/lib/infers/__pycache__/
+radiology/lib/monailabel/__pycache__/
+radiology/lib/monailabel/tasks/train/__pycache__/
+radiology/logs/
+radiology/model/sam2.1_hiera_l.yaml
+radiology/model/sam2.1_hiera_large.pt

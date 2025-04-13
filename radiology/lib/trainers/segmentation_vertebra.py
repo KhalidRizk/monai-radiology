@@ -36,7 +36,8 @@ from monai.transforms import (
     SelectItemsd,
 )
 
-from monailabel.tasks.train.basic_train import BasicTrainTask, Context
+from lib.monailabel.tasks.train.basic_train import BasicTrainTask
+from monailabel.tasks.train.basic_train import Context
 from monailabel.tasks.train.utils import region_wise_metrics
 
 logger = logging.getLogger(__name__)

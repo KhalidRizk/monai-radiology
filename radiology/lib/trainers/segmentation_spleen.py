@@ -30,7 +30,8 @@ from monai.transforms import (
     ToTensord,
 )
 
-from monailabel.tasks.train.basic_train import BasicTrainTask, Context
+from lib.monailabel.tasks.train.basic_train import BasicTrainTask
+from monailabel.tasks.train.basic_train import Context
 
 logger = logging.getLogger(__name__)
 

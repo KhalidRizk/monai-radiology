@@ -9,12 +9,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
+
 import logging
 
 import torch
 from lib.transforms.transforms import NormalizeLabelsInDatasetd
 from monai.handlers import TensorBoardImageHandler, from_engine
 from monai.inferers import SlidingWindowInferer
+# from monai.inferers import MemoryEfficientSlidingWindowInferer
 from monai.losses import DiceCELoss
 from monai.transforms import (
     Activationsd,
@@ -28,9 +34,11 @@ from monai.transforms import (
     ScaleIntensityRanged,
     SelectItemsd,
     Spacingd,
+    SpatialPadd
 )
 
-from monailabel.tasks.train.basic_train import BasicTrainTask, Context
+from lib.monailabel.tasks.train.basic_train import BasicTrainTask
+from monailabel.tasks.train.basic_train import Context
 from monailabel.tasks.train.utils import region_wise_metrics
 
 logger = logging.getLogger(__name__)
@@ -80,6 +88,7 @@ class LocalizationSpine(BasicTrainTask):
             ScaleIntensityRanged(keys="image", a_min=-1000, a_max=1900, b_min=0.0, b_max=1.0, clip=True),
             GaussianSmoothd(keys="image", sigma=0.4),
             ScaleIntensityd(keys="image", minv=-1.0, maxv=1.0),
+            SpatialPadd(keys=("image", "label"), spatial_size=self.roi_size, method="end"), #ِAdded
             RandSpatialCropd(
                 keys=["image", "label"],
                 roi_size=[self.roi_size[0], self.roi_size[1], self.roi_size[2]],
@@ -110,12 +119,15 @@ class LocalizationSpine(BasicTrainTask):
             ScaleIntensityRanged(keys="image", a_min=-1000, a_max=1900, b_min=0.0, b_max=1.0, clip=True),
             GaussianSmoothd(keys="image", sigma=0.4),
             ScaleIntensityd(keys="image", minv=-1.0, maxv=1.0),
+            SpatialPadd(keys=("image", "label"), spatial_size=self.roi_size, method="end"),  # Added
             SelectItemsd(keys=("image", "label")),
         ]
 
     def val_inferer(self, context: Context):
         return SlidingWindowInferer(
-            roi_size=self.roi_size, sw_batch_size=2, overlap=0.4, padding_mode="replicate", mode="gaussian"
+        # return MemoryEfficientSlidingWindowInferer(
+            # roi_size=self.roi_size, sw_batch_size=2, overlap=0.4, padding_mode="replicate", mode="gaussian"
+            roi_size=self.roi_size, sw_batch_size=1, overlap=0.4, padding_mode="replicate", mode="gaussian"
         )
 
     def norm_labels(self):
